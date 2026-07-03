@@ -1,8 +1,8 @@
 # Step 2 — Planning (Root Agent)
 
-Once brainstorming has resolved every open question, the Root Agent turns the clarified requirement into a structured, atomic plan **itself** — no planner or debugger sub-agent is spawned. The plan is presented to the user for approval (Step 3) before any code is written.
+Once brainstorming has resolved every open question, the Root Agent turns the clarified requirement into a structured, atomic plan **itself** — no planner or debugger sub-agent is spawned. The plan is **presented to the user as a chat message** for approval (Step 3) before any code is written.
 
-> Planning is read-only. No file edits, no command execution beyond read-only inspection.
+> Planning is read-only. No file edits, no command execution beyond read-only inspection. **DO NOT** write the plan to the Doc Directory in this step — persisting the plan to a file happens only in [Step 3 — User Approval Gate](./step-3-approval-gate.md) after the user approves.
 
 ---
 
@@ -27,7 +27,7 @@ Once brainstorming has resolved every open question, the Root Agent turns the cl
 
 ## Plan Template
 
-Write the plan using this template. Every section must be populated.
+Present the full plan to the user **in a chat message** using this template — do not persist it to a file yet. Every section must be populated.
 
 ```md
 - Author: Root Agent
@@ -100,7 +100,7 @@ Write the plan using this template. Every section must be populated.
 
 - Every task in the Task List must flag a `Responsible Role` (developer or tester) — the Root Agent extracts the matching rows when building the [developer](./developer-delegation-prompt.md) and [tester](./tester-delegation-prompt.md) delegation prompts.
 - **ALWAYS set Status to `Blocked` and list every open question** when anything is unclear — do not plan around gaps or make assumptions. Return to [Step 1 — Brainstorming](./step-1-brainstorming.md) to resolve them with the user.
-- The Root Agent **MUST** present the full plan to the user. **ALWAYS read step 3 - approval gateway** to understand how to interact with user selections. See [Step 3 — User Approval Gate](./step-3-approval-gate.md).
+- The Root Agent **MUST** present the full plan to the user **as a chat message only** — do not write it to the Doc Directory in this step. **ALWAYS read step 3 - approval gateway** to understand how to interact with user selections and when the plan is persisted to a file. See [Step 3 — User Approval Gate](./step-3-approval-gate.md).
 - If Status is `Blocked`, the Root Agent must ask the user before proceeding to Step 4. Execution must not begin with unresolved blockers.
 - The Root Agent reviews delivered work against this plan at Step 6 — keep requirements and acceptance criteria precise enough to review against.
 

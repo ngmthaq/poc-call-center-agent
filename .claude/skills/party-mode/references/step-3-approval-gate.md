@@ -1,10 +1,10 @@
 # Step 3 — User Approval Gate
 
-Before any implementation begins, the Root Agent **MUST** present the full plan (plan template from [Step 2 — Planning](./step-2-planning.md)) to the user and **wait** for explicit approval. **DO NOT** make things up.
+Before any implementation begins, the Root Agent **MUST** present the full plan (plan template from [Step 2 — Planning](./step-2-planning.md)) to the user **as a chat message** and **wait** for explicit approval. At this point the plan lives only in the chat — it has **not** been written to any file. **DO NOT** make things up.
 
 ## Approved
 
-When the user approves, persist the plan to the **Doc Directory** as a markdown file. Always copy the plan verbatim — **DO NOT** make things up.
+Only **after** the user approves, persist the plan to the **Doc Directory** as a markdown file. This is the first and only point at which the plan is written to disk. Always copy the plan verbatim from the chat message — **DO NOT** make things up.
 
 - File name template: `<dd-mm-yyyy-hh-mm-ss>-<plan-name>.md`
 - Example: `01-12-2026-16-30-01-handle-send-registration-mail.md`
