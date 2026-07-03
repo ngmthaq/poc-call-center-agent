@@ -6,8 +6,8 @@ Before any implementation begins, the Root Agent **MUST** present the full plan 
 
 Only **after** the user approves, persist the plan to the **Doc Directory** as a markdown file. This is the first and only point at which the plan is written to disk. Always copy the plan verbatim from the chat message — **DO NOT** make things up.
 
-- File name template: `<dd-mm-yyyy-hh-mm-ss>-<plan-name>.md`
-- Example: `01-12-2026-16-30-01-handle-send-registration-mail.md`
+- File name template: `<yyyy-mm-dd-hh-mm-ss>-<plan-name>.md`
+- Example: `2026-12-01-16-30-01-handle-send-registration-mail.md`
 
 Then proceed to **Step 4**.
 
