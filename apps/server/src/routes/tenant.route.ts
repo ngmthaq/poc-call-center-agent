@@ -10,6 +10,7 @@ import {
   listTenantsQuerySchema,
   updateTenantSchema,
 } from '../validators';
+import apiKeyRouter from './api-key.route';
 
 const router: Router = Router();
 
@@ -48,5 +49,7 @@ router.delete(
   '/:id',
   responseHandlerUtil.handle(tenantController.handleDelete),
 );
+
+router.use('/:id/keys', apiKeyRouter);
 
 export default router;

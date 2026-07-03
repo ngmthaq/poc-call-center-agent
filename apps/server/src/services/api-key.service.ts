@@ -1,10 +1,80 @@
 import { ApiKeyScope, ApiKeyStatus, TenantStatus } from '@prisma/client';
 import type { ApiKey, ApiKeyUsage } from '@prisma/client';
 import { timingSafeEqual } from 'node:crypto';
-import type { BotBindingResolution } from '../types/api-key';
+import type {
+  ApiKeySummary,
+  BotBindingResolution,
+  CreatedApiKey,
+} from '../types/api-key';
 import { apiKeyUtil, prismaUtil } from '../utils';
+import type { CreateApiKeyBody } from '../validators';
 
 export class ApiKeyService {
+  /**
+   * Mints a new API key for the tenant identified by `tenantId`. Returns the
+   * created key summary plus the raw secret — exposed exactly once — or `null`
+   * when no tenant matches so the controller can emit a 404.
+   *
+   * Only the deterministic `keyHash` is persisted; the raw secret is never
+   * logged or stored, and `keyHash` is stripped from the returned summary so it
+   * never reaches the HTTP layer.
+   */
+  public async createForTenant(
+    tenantId: string,
+    body: CreateApiKeyBody,
+  ): Promise<CreatedApiKey | null> {
+    const tenant = await prismaUtil.client.tenant.findUnique({
+      where: { id: tenantId },
+    });
+
+    if (tenant === null) {
+      return null;
+    }
+
+    const { raw, keyHash, keyPrefix } = apiKeyUtil.generateKey();
+
+    const created = await prismaUtil.client.apiKey.create({
+      data: {
+        tenantId,
+        name: body.name,
+        keyHash,
+        keyPrefix,
+        scopes: body.scopes,
+        ...(body.expiresAt !== undefined ? { expiresAt: body.expiresAt } : {}),
+      },
+      omit: { keyHash: true },
+    });
+
+    return { apiKey: created, key: raw };
+  }
+
+  /**
+   * Lists every API key owned by the tenant identified by `tenantId`, newest
+   * first, or `null` when no tenant matches so the controller can emit a 404.
+   *
+   * Each row is reduced to an `ApiKeySummary` with the secret `keyHash` removed,
+   * so only the display `keyPrefix` — never the raw key or its hash — is exposed.
+   */
+  public async listForTenant(
+    tenantId: string,
+  ): Promise<ApiKeySummary[] | null> {
+    const tenant = await prismaUtil.client.tenant.findUnique({
+      where: { id: tenantId },
+    });
+
+    if (tenant === null) {
+      return null;
+    }
+
+    const rows = await prismaUtil.client.apiKey.findMany({
+      where: { tenantId },
+      orderBy: { createdAt: 'desc' },
+      omit: { keyHash: true },
+    });
+
+    return rows;
+  }
+
   /**
    * Verifies a raw API key against the stored records and returns the matching
    * ApiKey when it is valid, or `null` otherwise. This path is read-only — it
